@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-var ErrFollowNotFound error = errors.New("Follow Not Found")
+var ErrFollowNotFound = errors.New("Follow Not Found")
 
 type FollowRepository struct {
 	db *sqlx.DB
@@ -18,19 +18,19 @@ func NewFollowRepository(db *sqlx.DB) *FollowRepository {
 	return &FollowRepository{db: db}
 }
 
-func (fwRepo *FollowRepository) CreateFollow(ctx context.Context, followerID int64, followedID int64) (int64, error) {
+func (fwRepo *FollowRepository) CreateFollow(ctx context.Context, follow *domain.Follow) (int64, error) {
 	query := `INSERT INTO follows (follower_id, followed_id) VALUES ($1, $2) RETURNING follow_id`
 	var id int64
-	err := fwRepo.db.QueryRowContext(ctx, query, followerID, followedID).Scan(&id)
+	err := fwRepo.db.QueryRowContext(ctx, query, follow.FollowerID, follow.FollowedID).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
 	return id, nil
 }
 
-func (fwRepo *FollowRepository) RemoveFollow(ctx context.Context, followerID int64, followedID int64) error {
+func (fwRepo *FollowRepository) RemoveFollow(ctx context.Context, follow *domain.Follow) error {
 	query := `DELETE FROM follows WHERE follower_id = $1 AND followed_id = $2`
-	result, err := fwRepo.db.ExecContext(ctx, query, followerID, followedID)
+	result, err := fwRepo.db.ExecContext(ctx, query, follow.FollowerID, follow.FollowedID)
 	if err != nil {
 		return err
 	}
@@ -60,10 +60,10 @@ func (fwRepo *FollowRepository) genericGetAllPerUser(ctx context.Context, userID
 	return follows, nil
 }
 
-func (fwRepo *FollowRepository) CheckIfUserFollowsAnother(ctx context.Context, followerID int64, followedID int64) (bool, error) {
+func (fwRepo *FollowRepository) CheckIfUserFollowsAnother(ctx context.Context, follow *domain.Follow) (bool, error) {
 	query := `SELECT EXISTS(SELECT 1 FROM follows WHERE follower_id = $1 AND followed_id = $2)`
 	var exists bool
-	err := fwRepo.db.QueryRowContext(ctx, query, followerID, followedID).Scan(&exists)
+	err := fwRepo.db.QueryRowContext(ctx, query, follow.FollowerID, follow.FollowedID).Scan(&exists)
 	if err != nil {
 		return false, err
 	}

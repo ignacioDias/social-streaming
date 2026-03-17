@@ -121,7 +121,6 @@ var reviewsTable string = `CREATE TABLE IF NOT EXISTS reviews (
 	score INT NOT NULL CHECK (score BETWEEN 0 AND 10),
 	review TEXT NOT NULL DEFAULT '',
 	target_id BIGINT NOT NULL,
-	target_type SMALLINT NOT NULL CHECK (target_type IN (0, 1))
 )`
 
 var commentsTable string = `CREATE TABLE IF NOT EXISTS comments (
@@ -129,7 +128,7 @@ var commentsTable string = `CREATE TABLE IF NOT EXISTS comments (
 	user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 	target_id BIGINT NOT NULL,
 	content TEXT NOT NULL,
-	target_type SMALLINT NOT NULL CHECK (target_type IN (0, 1, 2, 3))
+	target_type SMALLINT NOT NULL CHECK (target_type IN (0, 1))
 )`
 
 func (db *Database) Init() error {

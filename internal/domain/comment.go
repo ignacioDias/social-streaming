@@ -11,8 +11,6 @@ type Comment struct {
 type CommentTargetType int
 
 const (
-	POST CommentTargetType = iota
-	MOVIE
-	SERIES
+	REVIEW CommentTargetType = iota
 	PROFILE
 )
