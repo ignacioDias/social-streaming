@@ -18,19 +18,19 @@ func NewReviewRepository(db *sqlx.DB) *ReviewRepository {
 	return &ReviewRepository{db: db}
 }
 
-func (reviewRepo *ReviewRepository) CreateReview(ctx context.Context, review *domain.Review) (int64, error) {
+func (rr *ReviewRepository) CreateReview(ctx context.Context, review *domain.Review) (int64, error) {
 	query := `INSERT INTO reviews (user_id, score, review, target_id) VALUES ($1, $2, $3, $4) RETURNING review_id`
 	var id int64
-	err := reviewRepo.db.QueryRowContext(ctx, query, review.UserID, review.Score, review.Review, review.TargetID).Scan(&id)
+	err := rr.db.QueryRowContext(ctx, query, review.UserID, review.Score, review.Review, review.TargetID).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
 	return id, nil
 }
 
-func (reviewRepo *ReviewRepository) DeleteReviewByID(ctx context.Context, reviewID int64) error {
+func (rr *ReviewRepository) DeleteReviewByID(ctx context.Context, reviewID int64) error {
 	query := `DELETE FROM reviews WHERE review_id = $1`
-	result, err := reviewRepo.db.ExecContext(ctx, query, reviewID)
+	result, err := rr.db.ExecContext(ctx, query, reviewID)
 	if err != nil {
 		return err
 	}
@@ -44,20 +44,20 @@ func (reviewRepo *ReviewRepository) DeleteReviewByID(ctx context.Context, review
 	return nil
 }
 
-func (reviewRepo *ReviewRepository) GetAllReviewsPerUser(ctx context.Context, userID int64) ([]domain.Review, error) {
-	query := `SELECT review_id, user_id, score, review, target_id FROM reviews WHERE user_id = $1`
-	return reviewRepo.genericGetAllReviews(ctx, query, userID)
+func (rr *ReviewRepository) GetAllReviewsPerUser(ctx context.Context, userID int64, limit, offset int) ([]domain.Review, error) {
+	query := `SELECT review_id, user_id, score, review, target_id, created_at FROM reviews WHERE user_id = $1 ORDER BY created_at LIMIT $2 OFFSET $3`
+	return rr.genericGetAllReviews(ctx, query, userID, limit, offset)
 }
 
-func (reviewRepo *ReviewRepository) GetAllReviewsPerMedia(ctx context.Context, mediaID int64) ([]domain.Review, error) {
-	query := `SELECT review_id, user_id, score, review, target_id FROM reviews WHERE target_id = $1`
-	return reviewRepo.genericGetAllReviews(ctx, query, mediaID)
+func (rr *ReviewRepository) GetAllReviewsPerMedia(ctx context.Context, mediaID int64, limit, offset int) ([]domain.Review, error) {
+	query := `SELECT review_id, user_id, score, review, target_id, created_at FROM reviews WHERE target_id = $1 ORDER BY created_at LIMIT $2 OFFSET $3`
+	return rr.genericGetAllReviews(ctx, query, mediaID, limit, offset)
 
 }
 
-func (reviewRepo *ReviewRepository) genericGetAllReviews(ctx context.Context, query string, idToSearch int64) ([]domain.Review, error) {
+func (rr *ReviewRepository) genericGetAllReviews(ctx context.Context, query string, idToSearch int64, limit, offset int) ([]domain.Review, error) {
 	var reviews []domain.Review
-	if err := sqlx.SelectContext(ctx, reviewRepo.db, &reviews, query, idToSearch); err != nil {
+	if err := sqlx.SelectContext(ctx, rr.db, &reviews, query, idToSearch, limit, offset); err != nil {
 		return nil, err
 	}
 	return reviews, nil

@@ -49,6 +49,7 @@ var followsTable string = `CREATE TABLE IF NOT EXISTS follows (
 	follow_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	follower_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 	followed_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	UNIQUE (follower_id, followed_id),
 	CHECK (follower_id <> followed_id)
 )`
@@ -68,6 +69,7 @@ var mediaTable string = `CREATE TABLE IF NOT EXISTS media (
 	total_ratings BIGINT NOT NULL DEFAULT 0,
 	sum_ratings BIGINT NOT NULL DEFAULT 0,
 	tags tag[] NOT NULL DEFAULT '{}',
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	CHECK (total_ratings >= 0),
 	CHECK (sum_ratings >= 0)
 )`
@@ -119,6 +121,7 @@ var reviewsTable string = `CREATE TABLE IF NOT EXISTS reviews (
 	review_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
 	score INT NOT NULL CHECK (score BETWEEN 0 AND 10),
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	review TEXT NOT NULL DEFAULT '',
 	target_id BIGINT NOT NULL,
 )`
