@@ -7,6 +7,8 @@ type Media struct {
 	TotalRatings int64  `json:"totalRatings" db:"total_ratings"`
 	SumRatings   int64  `json:"sumRatings" db:"sum_ratings"`
 	Tags         []Tag  `json:"tags" db:"tags"`
+	Trailer      string `json:"trailer" db:"trailer"`
+	Thumbnail    string `json:"thumbnail" db:"thumbnail"`
 }
 type Movie struct {
 	Media

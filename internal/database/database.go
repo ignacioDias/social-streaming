@@ -65,6 +65,8 @@ var sessionsTable string = `CREATE TABLE IF NOT EXISTS sessions (
 var mediaTable string = `CREATE TABLE IF NOT EXISTS media (
 	media_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	title TEXT NOT NULL,
+	thumbnail TEXT NOT NULL,
+	trailer TEXT NOT NULL,
 	description TEXT NOT NULL DEFAULT '',
 	total_ratings BIGINT NOT NULL DEFAULT 0,
 	sum_ratings BIGINT NOT NULL DEFAULT 0,

@@ -16,9 +16,9 @@ func NewMediaRepository(db *sqlx.DB) *MediaRepository {
 }
 
 func (mr *MediaRepository) CreateMovie(ctx context.Context, movie *domain.Movie) error {
-	query := `INSERT INTO media (title, description, total_ratings, sum_ratings, tags) VALUES ($1, $2, 0, 0, $3) returning media_id`
+	query := `INSERT INTO media (title, description, total_ratings, sum_ratings, tags, trailer, thumbnail) VALUES ($1, $2, 0, 0, $3, $4, $5) returning media_id`
 	var mediaID int64
-	if err := mr.db.QueryRowxContext(ctx, query, movie.Title, movie.Description, movie.Tags).Scan(&mediaID); err != nil {
+	if err := mr.db.QueryRowxContext(ctx, query, movie.Title, movie.Description, movie.Tags, movie.Trailer, movie.Thumbnail).Scan(&mediaID); err != nil {
 		return err
 	}
 	movie.MediaID = mediaID
@@ -29,9 +29,9 @@ func (mr *MediaRepository) CreateMovie(ctx context.Context, movie *domain.Movie)
 	return nil
 }
 func (mr *MediaRepository) CreateSeries(ctx context.Context, series *domain.Series) error {
-	query := `INSERT INTO media (title, description, total_ratings, sum_ratings, tags) VALUES ($1, $2, 0, 0, $3) returning media_id`
+	query := `INSERT INTO media (title, description, total_ratings, sum_ratings, tags, trailer, thumbnail) VALUES ($1, $2, 0, 0, $3, $4, $5) returning media_id`
 	var mediaID int64
-	if err := mr.db.QueryRowxContext(ctx, query, series.Title, series.Description, series.Tags).Scan(&mediaID); err != nil {
+	if err := mr.db.QueryRowxContext(ctx, query, series.Title, series.Description, series.Tags, series.Trailer, series.Thumbnail).Scan(&mediaID); err != nil {
 		return err
 	}
 	series.MediaID = mediaID
